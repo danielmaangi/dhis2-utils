@@ -46,3 +46,11 @@ venv.bak/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# data
+data/
+logs/
+*.log
+*.xlsx
+*.csv
+*.sqlite3
