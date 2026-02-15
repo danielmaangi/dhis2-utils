@@ -47,7 +47,11 @@ DHIS2_PASSWORD=your_password
 
 ### Solving "User does not have write access to category option" Error
 
-This error occurs when users don't have **data write permissions** on category options. Use the `share_data_access.py` script:
+⚠️ **Important:** After running the script, you **must** perform DHIS2 maintenance steps to apply changes system-wide.
+
+This error occurs when users don't have **data write permissions** on category options. Follow this complete workflow:
+
+#### Step 1: Run the Sharing Script
 
 ```bash
 python share_data_access.py
@@ -57,6 +61,40 @@ This will:
 - Grant **data write access** (`--rw----`) to all users for all category options
 - Show real-time progress for each category option
 - Save detailed results to `data_sharing_results.json`
+
+#### Step 2: Perform DHIS2 Maintenance (Required!)
+
+After the script completes successfully, you must perform these maintenance operations in DHIS2:
+
+**Navigate to:** `Data Administration → Maintenance`
+
+1. **Update category option combinations**
+   - Find "Update category option combinations" in the maintenance list
+   - Click "Perform Maintenance"
+   - Wait for completion
+   - **Why?** This regenerates all category option combos with the new permission settings
+
+2. **Clear application cache**
+   - Find "Clear application cache" in the maintenance list
+   - Click "Perform Maintenance"
+   - Wait for completion
+   - **Why?** Ensures the DHIS2 server picks up new permissions immediately
+
+#### Step 3: User Action (Browser Cache)
+
+Notify users experiencing the error to take one of these actions:
+- **Clear browser cache** (Ctrl+Shift+Delete)
+- Perform a **hard refresh** (Ctrl+F5 or Cmd+Shift+R)
+- **Log out and log back in**
+
+**Why?** Clears cached permission data stored in the browser.
+
+#### Verification
+
+After completing all steps:
+- Test data entry as a regular user
+- The error should no longer appear
+- All users should be able to write data to all category options
 
 ### Basic Metadata Sharing
 
@@ -259,14 +297,40 @@ This project is open source. Please check with your organization's policies befo
 
 **Error Message:**
 ```
-User does not have write access to category option combo: jSb0qiyf0Gi
-[User has no data write access for CategoryOption: gt6o47euUrA]
+User does not have write access to category option combo: YDoNYYa99r9
+[User has no data write access for CategoryOption: z9TQgH9cMnp]
 ```
 
-**Solution:**
-1. Run `python share_data_access.py`
-2. This grants data write access to all category options for all users
-3. Results are saved to `data_sharing_results.json`
+**Root Cause:**
+- Users lack **data write permissions** on category options
+- Category option combos inherit permissions from their underlying category options
+- Fixing category option permissions automatically resolves combo access issues
+
+**Complete Solution:**
+
+1. **Run the sharing script:**
+   ```bash
+   python share_data_access.py
+   ```
+   - Grants data write access to all category options for all users
+   - Results saved to `data_sharing_results.json`
+
+2. **Perform DHIS2 maintenance** (Data Administration → Maintenance):
+   - ✅ Update category option combinations
+   - ✅ Clear application cache
+
+3. **User action:**
+   - Clear browser cache or hard refresh (Ctrl+F5)
+   - Or log out and log back in
+
+4. **Verify:**
+   - Test data entry as a regular user
+   - Error should be resolved
+
+**Important Notes:**
+- ⚠️ Maintenance steps are **required** - the script alone is not sufficient
+- Category option combos automatically inherit permissions from category options
+- No need to separately manage combo permissions
 
 ### Difference Between Metadata and Data Sharing
 
